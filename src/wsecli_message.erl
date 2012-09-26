@@ -69,12 +69,12 @@ frame(Data, Options) ->
 
 -spec decode(Data::binary(), Type :: message_type(), Message::#message{}) -> list(#message{}).
 decode(Data, begin_message, _Message) ->
-  Frames = wsecli_framing:from_binary(Data),
-  lists:reverse(process_frames(begin_message, Frames, []));
+  {Bin, Frames} = wsecli_framing:from_binary(Data),
+  {Bin, lists:reverse(process_frames(begin_message, Frames, []))};
 
 decode(Data, continue_message, Message) ->
-  Frames = wsecli_framing:from_binary(Data),
-  lists:reverse(process_frames(continue_message, Frames, [Message | []])).
+  {Bin, Frames} = wsecli_framing:from_binary(Data),
+  {Bin, lists:reverse(process_frames(continue_message, Frames, [Message | []]))}.
 
 -spec process_frames(Type:: message_type(), Frames :: list(#frame{}), Messages :: list(#message{})) -> list(#message{}).
 process_frames(_, [], Acc) ->
