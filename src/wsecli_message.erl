@@ -85,6 +85,9 @@ process_frames(begin_message, Frames, Acc) ->
 process_frames(continue_message, Frames, [FramgmentedMessage | Acc]) ->
   wtf(Frames, FramgmentedMessage, Acc).
 
+wtf([], _, Acc) ->
+  Acc;
+  
 wtf([#frame{ payload = <<>> } | Frames], XMessage, Acc) ->
   %% skip this
   wtf(Frames, XMessage, Acc);
