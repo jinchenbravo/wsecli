@@ -80,47 +80,35 @@ decode(Data, continue_message, Message) ->
 process_frames(_, [], Acc) ->
   Acc;
 process_frames(begin_message, Frames, Acc) ->
-  wtf(Frames, begin_message, #message{}, Acc);
+  wtf(Frames, #message{}, Acc);
 
 process_frames(continue_message, Frames, [FramgmentedMessage | Acc]) ->
-  wtf(Frames, continue_message, FramgmentedMessage, Acc).
+  wtf(Frames, FramgmentedMessage, Acc).
 
-wtf([Frame | Frames], Type, XMessage, Acc) ->
-  case process_frame(Frame, Type, XMessage) of
+wtf([Frame | Frames], XMessage, Acc) ->
+  case process_frame(Frame, XMessage) of
     {fragmented, Message} ->
       process_frames(continue_message, Frames, [Message#message{type = fragmented} | Acc]);
     {completed, Message} ->
       process_frames(begin_message, Frames, [Message | Acc])
   end.
 
--spec process_frame(Frame :: #frame{}, MessageType :: message_type(), Message :: #message{})-> {fragmented | completed, #message{}}.
-process_frame(Frame, begin_message, Message) ->
-  case contextualize_frame(Frame) of
-    open_close ->
-      BuiltMessage = build_message(Message, [Frame]),
-      {completed, BuiltMessage};
-    open_continue ->
-      Frames = Message#message.frames,
-      {fragmented, Message#message{frames = [Frame | Frames]}}
-  end;
-
-process_frame(Frame, continue_message, Message) ->
+-spec process_frame(Frame :: #frame{}, Message :: #message{})-> {fragmented | completed, #message{}}.
+process_frame(Frame, Message) ->
   case contextualize_frame(Frame) of
     continue ->
       Frames = Message#message.frames,
       {fragmented, Message#message{frames = [Frame | Frames]}};
-    continue_close ->
+    close ->
       BuiltMessage = build_message(Message, lists:reverse([Frame | Message#message.frames])),
       {completed, BuiltMessage}
   end.
 
--spec contextualize_frame(Frame :: #frame{}) -> continue_close | open_continue | continue | open_close.
+-spec contextualize_frame(Frame :: #frame{}) -> close | continue.
 contextualize_frame(Frame) ->
   case {Frame#frame.fin, Frame#frame.opcode} of
-    {1, 0} -> continue_close;
-    {0, 0} -> continue;
-    {1, _} -> open_close;
-    {0, _} -> open_continue
+    {1, _} -> close;
+    {0, _} -> continue
   end.
 
 build_message(Message, Frames) ->
