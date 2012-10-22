@@ -71,6 +71,7 @@ frame(Data, Options) ->
 -spec decode(Data::binary(), Type :: message_type(), Message::#message{}) -> list(#message{}).
 decode(Data, begin_message, _Message) ->
   {Bin, Frames} = wsecli_framing:from_binary(Data),
+  lager:info("inside decode and Frames is ~p",[Frames]),
   {Bin, lists:reverse(process_frames(Frames, [], []))};
   % {Bin, lists:reverse(process_frames(begin_message, Frames, []))};
 
