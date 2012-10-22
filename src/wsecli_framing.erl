@@ -57,20 +57,18 @@ to_binary(Frame) ->
 from_binary(Data) ->
   from_binary(Data, []).
 
-%from_binary(<<>>, Acc) ->
-%  {<<>>, lists:reverse(Acc)};
-
 from_binary(<<Head:9, 126:7, PayloadLen:16, Payload:PayloadLen/binary, Rest/binary>>, Acc)->
-  from_binary(Rest, [decode_frame(<<Head, 126:7, PayloadLen, Payload/binary>>) | Acc]);
+  from_binary(Rest, [decode_frame(<<Head:9, 126:7, PayloadLen:16, Payload/binary>>) | Acc]);
 
 from_binary(<<Head:9, 127:7, PayloadLen:64, Payload:PayloadLen/binary, Rest/binary>>, Acc)->
-  from_binary(Rest, [decode_frame(<<Head, 127:7, PayloadLen, Payload/binary>>) | Acc]);
+  from_binary(Rest, [decode_frame(<<Head:9, 127:7, PayloadLen:64, Payload/binary>>) | Acc]);
 
 from_binary(<<Head:9, PayloadLen:7, Payload:PayloadLen/binary, Rest/binary>>, Acc) ->
-  from_binary(Rest, [decode_frame(<<Head, PayloadLen, Payload/binary>>) | Acc]);
+  from_binary(Rest, [decode_frame(<<Head:9, PayloadLen:7, Payload/binary>>) | Acc]);
 
 from_binary(Bin, Acc) when is_binary(Bin) ->
   {Bin, lists:reverse(Acc)}.
+
 
 decode_frame(Data = <<Fin:1, Rsv1:1, Rsv2:1, Rsv3:1, Opcode:4, Mask:1, _/bits>> ) ->
   % TODO: ensure that Mask is not set
