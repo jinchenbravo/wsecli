@@ -62,19 +62,19 @@ from_binary(<<Head:9, 126:7, PayloadLen:16/binary, Payload:PayloadLen/binary, Re
   lager:info ("inside from_binary and Payload is ~p",[Payload]),
   Rest1 = <<Payload/binary,Rest/binary>>,
   PL = PayloadLen * 8,
-  <<PLD:PL/binary, Rest2/binary>> = Rest1,
+  <<PLD:PL/binary, Rest2/binary>> = <<Rest1/binary>>,
   from_binary(Rest2, [decode_frame(<<Head:9/binary, 126:7, PayloadLen:16/binary, PLD:PL/binary>>) | Acc]);
 
 from_binary(<<Head:9, 127:7, PayloadLen:64, Payload:PayloadLen/binary, Rest/binary>>, Acc)->
   Rest1 = <<Payload/binary,Rest/binary>>,
   PL = PayloadLen * 8,
-  <<PLD:PL/binary, Rest2/binary>> = Rest1,
+  <<PLD:PL/binary, Rest2/binary>> = <<Rest1/binary>>,
   from_binary(Rest2, [decode_frame(<<Head:9/binary, 127:7, PayloadLen:64/binary, PLD:PL/binary>>) | Acc]);
 
 from_binary(<<Head:9, PayloadLen:7, Payload:PayloadLen/binary, Rest/binary>>, Acc) ->
   Rest1 = <<Payload/binary,Rest/binary>>,
   PL = PayloadLen * 8,
-  <<PLD:PL/binary, Rest2/binary>> = Rest1,
+  <<PLD:PL/binary, Rest2/binary>> = <<Rest1/binary>>,
   from_binary(Rest2, [decode_frame(<<Head:9/binary, PayloadLen:7/binary, PLD:PL/binary>>) | Acc]);
 
 from_binary(Bin, Acc) when is_binary(Bin) ->
