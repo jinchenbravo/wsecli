@@ -65,16 +65,19 @@ from_binary(<<Head:9, 126:7, PayloadLen:16, Payload:PayloadLen/binary, Rest/bina
   from_binary(Rest, [decode_frame(<<Head:9, 126:7, PayloadLen:16, Payload:PayloadLen/binary>>) | Acc]);
 
 from_binary(<<Head:9, 127:7, PayloadLen:64, Payload:PayloadLen/binary, Rest/binary>>, Acc)->
+  lager:info ("inside from_binary3 and PayloadLen is ~p",[PayloadLen]),
+  lager:info ("inside from_binary3 and Payload is ~p",[Payload]),
+  lager:info ("inside from_binary3 and Rest is ~p",[Rest]),  
   from_binary(Rest, [decode_frame(<<Head:9, 127:7, PayloadLen:64, Payload:PayloadLen/binary>>) | Acc]);
 
 from_binary(<<Head:9, PayloadLen:7, Payload:PayloadLen/binary, Rest/binary>>, Acc) ->
-  % lager:info ("inside from_binary and Head is ~p",[Head]),  
-  % lager:info ("inside from_binary and PayloadLen is ~p",[PayloadLen]),
-  % lager:info ("inside from_binary and Payload is ~p",[Payload]),
-  % lager:info ("inside from_binary and Rest is ~p",[Rest]),  
+  lager:info ("inside from_binary4 and PayloadLen is ~p",[PayloadLen]),
+  lager:info ("inside from_binary4 and Payload is ~p",[Payload]),
+  lager:info ("inside from_binary4 and Rest is ~p",[Rest]),  
   from_binary(Rest, [decode_frame(<<Head:9, PayloadLen:7, Payload:PayloadLen/binary>>) | Acc]);
 
 from_binary(Bin, Acc) when is_binary(Bin) ->
+  lager:info ("inside from_binary5 and Bin is ~p",[Bin]),  
   {Bin, lists:reverse(Acc)}.
 
 
