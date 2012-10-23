@@ -57,10 +57,10 @@ to_binary(Frame) ->
 from_binary(Data) ->
   from_binary(Data, []).
 
-from_binary(<<Head:9, 126:7, PayloadLen:16, Payload:(PayloadLen*8)/binary, Rest/binary>>, Acc)->
+from_binary(<<Head:9, 126:7, PayloadLen:16/integer, Payload:(PayloadLen*8)/binary, Rest/binary>>, Acc)->
 %  from_binary(Rest, [decode_frame(<<Head:9, 126:7, PayloadLen:16, Payload:PayloadLen/binary>>) | Acc]);
-    lager:info ("inside from_binary and PayloadLen is ~p",[Payloadlen]),
-   from_binary(Rest, [decode_frame(<<Head:9, 126:7, PayloadLen:16, Payload:(PayloadLen*8)/binary>>) | Acc]);
+%    lager:info ("inside from_binary and PayloadLen is ~p",[Payloadlen]),
+   from_binary(Rest, [decode_frame(<<Head/binary, 126:7/binary, PayloadLen/binary, Payload/binary>>) | Acc]);
 
 from_binary(<<Head:9, 127:7, PayloadLen:64, Payload:(PayloadLen*8)/binary, Rest/binary>>, Acc)->
   from_binary(Rest, [decode_frame(<<Head:9, 127:7, PayloadLen:64, Payload:(PayloadLen*8)/binary>>) | Acc]);
