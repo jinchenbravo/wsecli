@@ -55,11 +55,13 @@ to_binary(Frame) ->
 
 -spec from_binary(Data::binary()) -> list(#frame{}).
 from_binary(Data) ->
+  lager:info("inside from_binary1 and Data is ~p",[Data]),
   from_binary(Data, []).
 
 from_binary(<<Head:9, 126:7, PayloadLen:16, Payload:PayloadLen/binary, Rest/binary>>, Acc)->
-  % lager:info ("inside from_binary and PayloadLen is ~p",[PayloadLen]),
-  % lager:info ("inside from_binary and Payload is ~p",[Payload]),
+  lager:info ("inside from_binary2 and PayloadLen is ~p",[PayloadLen]),
+  lager:info ("inside from_binary2 and Payload is ~p",[Payload]),
+  lager:info ("inside from_binary2 and Rest is ~p",[Rest]),  
   from_binary(Rest, [decode_frame(<<Head:9, 126:7, PayloadLen:16, Payload:PayloadLen/binary>>) | Acc]);
 
 from_binary(<<Head:9, 127:7, PayloadLen:64, Payload:PayloadLen/binary, Rest/binary>>, Acc)->
