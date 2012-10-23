@@ -76,8 +76,11 @@ from_binary(<<Head:9, PayloadLen:7, Payload:PayloadLen/binary, Rest/binary>>, Ac
   lager:info ("inside from_binary4 and PayloadLen is ~p",[PayloadLen]),
   lager:info ("inside from_binary4 and Payload is ~p",[Payload]),
   lager:info ("inside from_binary4 and Rest is ~p",[Rest]),  
-  from_binary(Rest, [decode_frame(<<Head:9, PayloadLen:7, Payload:PayloadLen/binary>>) | Acc]);
-
+  case PayloadLen of
+    126 -> {<<Head:9, PayloadLen:7, Payload:PayloadLen/binary, Rest/binary>>, lists:reverse(Acc)};
+    127 -> {<<Head:9, PayloadLen:7, Payload:PayloadLen/binary, Rest/binary>>, lists:reverse(Acc)};
+    _ ->  from_binary(Rest, [decode_frame(<<Head:9, PayloadLen:7, Payload:PayloadLen/binary>>) | Acc])
+  end;
 from_binary(Bin, Acc) when is_binary(Bin) ->
   lager:info ("inside from_binary5 and Bin is ~p",[Bin]),  
   {Bin, lists:reverse(Acc)}.
