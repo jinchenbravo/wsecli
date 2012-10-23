@@ -56,6 +56,8 @@ to_binary(Frame) ->
 -spec from_binary(Data::binary()) -> list(#frame{}).
 from_binary(Data) ->
   lager:info("inside from_binary1 and Data is ~p",[Data]),
+  DL = byte_size(Data),
+  lager:info("inside from_binary1 and DataSize is ~p",[DL]),
   from_binary(Data, []).
 
 from_binary(<<Head:9, 126:7, PayloadLen:16, Payload:PayloadLen/binary, Rest/binary>>, Acc)->
