@@ -57,7 +57,7 @@ to_binary(Frame) ->
 from_binary(Data) ->
   from_binary(Data, []).
 
-from_binary(<<Head:9, 126:7, PayloadLen:16/binary, Payload:PayloadLen/binary, Rest/binary>>, Acc)->
+from_binary(<<Head:9, 126:7, PayloadLen:16, Payload:PayloadLen/binary, Rest/binary>>, Acc)->
   lager:info ("inside from_binary and PayloadLen is ~p",[PayloadLen]),
   lager:info ("inside from_binary and Payload is ~p",[Payload]),
   Rest1 = <<Payload/binary,Rest/binary>>,
@@ -72,8 +72,12 @@ from_binary(<<Head:9, 127:7, PayloadLen:64, Payload:PayloadLen/binary, Rest/bina
   from_binary(Rest2, [decode_frame(<<Head:9/binary, 127:7, PayloadLen:64/binary, PLD:PL/binary>>) | Acc]);
 
 from_binary(<<Head:9, PayloadLen:7, Payload:PayloadLen/binary, Rest/binary>>, Acc) ->
+  lager:info ("inside from_binary and PayloadLen is ~p",[PayloadLen]),
+  lager:info ("inside from_binary and Payload is ~p",[Payload]),
   Rest1 = <<Payload/binary,Rest/binary>>,
   PL = PayloadLen * 8,
+  lager:info ("inside from_binary and Rest1 is ~p",[Rest1]),
+  lager:info ("inside from_binary and PL is ~p",[PL]),
   <<PLD:PL/binary, Rest2/binary>> = <<Rest1/binary>>,
   from_binary(Rest2, [decode_frame(<<Head:9/binary, PayloadLen:7/binary, PLD:PL/binary>>) | Acc]);
 
