@@ -57,22 +57,25 @@ to_binary(Frame) ->
 from_binary(Data) ->
   from_binary(Data, []).
 
-from_binary(<<Head:9, 126:7, PayloadLen:16/binary, Rest/binary>>, Acc)->
-%  from_binary(Rest, [decode_frame(<<Head:9, 126:7, PayloadLen:16, Payload:PayloadLen/binary>>) | Acc]);
-   lager:info ("inside from_binary and PayloadLen is ~p",[PayloadLen]),
-   PL = PayloadLen * 8,
-   <<Payload:PL/binary, Rest1/binary>> = Rest,
-   from_binary(Rest1, [decode_frame(<<Head:9/binary, 126:7, PayloadLen:16/binary, Payload:PL/binary>>) | Acc]);
-
-from_binary(<<Head:9, 127:7, PayloadLen:64/binary, Rest/binary>>, Acc)->
+from_binary(<<Head:9, 126:7, PayloadLen:16/binary, Payload:PayloadLen/binary, Rest/binary>>, Acc)->
+  lager:info ("inside from_binary and PayloadLen is ~p",[PayloadLen]),
+  lager:info ("inside from_binary and Payload is ~p",[Payload]),
+  Rest1 = <<Payload,Rest>>,
   PL = PayloadLen * 8,
-  <<Payload:PL/binary, Rest1/binary>> = Rest,
-  from_binary(Rest1, [decode_frame(<<Head:9/binary, 127:7, PayloadLen:64/binary, Payload:PL/binary>>) | Acc]);
+  <<PLD:PL/binary, Rest2/binary>> = Rest1,
+  from_binary(Rest2, [decode_frame(<<Head:9/binary, 126:7, PayloadLen:16/binary, PLD:PL/binary>>) | Acc]);
 
-from_binary(<<Head:9, PayloadLen:7/binary, Rest/binary>>, Acc) ->
+from_binary(<<Head:9, 127:7, PayloadLen:64, Payload:PayloadLen/binary, Rest/binary>>, Acc)->
+  Rest1 = <<Payload,Rest>>,
   PL = PayloadLen * 8,
-  <<Payload:PL/binary, Rest1/binary>> = Rest,
-  from_binary(Rest1, [decode_frame(<<Head:9/binary, PayloadLen:7/binary, Payload:PL/binary>>) | Acc]);
+  <<PLD:PL/binary, Rest2/binary>> = Rest1,
+  from_binary(Rest2, [decode_frame(<<Head:9/binary, 127:7, PayloadLen:64/binary, PLD:PL/binary>>) | Acc]);
+
+from_binary(<<Head:9, PayloadLen:7, Payload:PayloadLen/binary, Rest/binary>>, Acc) ->
+  Rest1 = <<Payload,Rest>>,
+  PL = PayloadLen * 8,
+  <<PLD:PL/binary, Rest2/binary>> = Rest1,
+  from_binary(Rest2, [decode_frame(<<Head:9/binary, PayloadLen:7/binary, PLD:PL/binary>>) | Acc]);
 
 from_binary(Bin, Acc) when is_binary(Bin) ->
   {Bin, lists:reverse(Acc)}.
