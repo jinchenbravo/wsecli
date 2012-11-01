@@ -11,7 +11,7 @@
 %   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 %   See the License for the specific language governing permissions and
 %   limitations under the License.
-%Jin chen 2012-10-18
+% Jin chen 2012-10-18
 
 %% @hidden
 
@@ -99,40 +99,6 @@ process_frames([Frame|Frames], Facc, Macc) ->
       NewFacc = [Frame|Facc],
       process_frames(Frames,NewFacc,Macc)
   end.
-% -spec process_frames(Type:: message_type(), Frames :: list(#frame{}), Messages :: list(#message{})) -> list(#message{}).
-% process_frames(_, [], Acc) ->
-%   Acc;
-% process_frames(begin_message, Frames, Acc) ->
-%   wtf(Frames, #message{}, Acc);
-
-% process_frames(continue_message, Frames, [FramgmentedMessage | Acc]) ->
-%   wtf(Frames, FramgmentedMessage, Acc).
-
-% wtf([], _, Acc) ->
-%   Acc;
-  
-% wtf([#frame{ payload = <<>> } | Frames], XMessage, Acc) ->
-%   %% skip this
-%   wtf(Frames, XMessage, Acc);
-
-% wtf([Frame | Frames], XMessage, Acc) ->
-%   case process_frame(Frame, XMessage) of
-%     {fragmented, Message} ->
-%       process_frames(continue_message, Frames, [Message#message{type = fragmented} | Acc]);
-%     {completed, Message} ->
-%       process_frames(begin_message, Frames, [Message | Acc])
-%   end.
-
-% -spec process_frame(Frame :: #frame{}, Message :: #message{})-> {fragmented | completed, #message{}}.
-% process_frame(Frame, Message) ->
-%   case contextualize_frame(Frame) of
-%     continue ->
-%       Frames = Message#message.frames,
-%       {fragmented, Message#message{frames = [Frame | Frames]}};
-%     close ->
-%       BuiltMessage = build_message(Message, lists:reverse([Frame | Message#message.frames])),
-%       {completed, BuiltMessage}
-%   end.
 
 -spec contextualize_frame(Frame :: #frame{}) -> close | continue.
 contextualize_frame(Frame) ->
