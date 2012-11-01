@@ -77,6 +77,10 @@ from_binary(<<Head:9, PayloadLen:7, Payload:PayloadLen/binary, Rest/binary>>, Ac
   % lager:info ("inside from_binary4 and Payload is ~p",[Payload]),
   % lager:info ("inside from_binary4 and Rest is ~p",[Rest]),  
   case PayloadLen of
+    %
+    % While the Payload length is 126/127, but the whole length of the frame is less than 126/127 
+    % which means this is a fragment string, needs to return it as a remaining string
+    %
     126 -> {<<Head:9, PayloadLen:7, Payload:PayloadLen/binary, Rest/binary>>, lists:reverse(Acc)};
     127 -> {<<Head:9, PayloadLen:7, Payload:PayloadLen/binary, Rest/binary>>, lists:reverse(Acc)};
     _ ->  from_binary(Rest, [decode_frame(<<Head:9, PayloadLen:7, Payload:PayloadLen/binary>>) | Acc])
