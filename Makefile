@@ -22,6 +22,6 @@ get-deps:
 
 compile-deps:
 	@$(REBAR) compile
-test:
+test: compile
 	@$(REBAR) ct
 
