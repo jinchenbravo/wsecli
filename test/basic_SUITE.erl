@@ -9,5 +9,9 @@ all() -> [encode_test].
 
 -spec encode_test(_Config) -> ok.
 encode_test(_Config)->
-	mock_http_server:start(self(), 8081).
+	
+	B1 = <<137>>,
+	B2 = wsecli_message:encode(<<137>>,binary),
+	io:format("B2 is ~p",[B2]).
+
 
