@@ -3,9 +3,9 @@
 -include_lib("common_test/include/ct.hrl").
 -include("wsecli.hrl").
 -export([all/0]).
--export([decode_test/1, decode_test1/1]).
+-export([decode_test/1, decode_test1/1,encode_test/1]).
 
-all() -> [decode_test, decode_test1].
+all() -> [decode_test, decode_test1,encode_test].
 
 -spec decode_test(_Config) -> ok.
 decode_test(_Config)->
@@ -15,7 +15,8 @@ decode_test(_Config)->
 	B1 = <<137,0>>,
 	WM = wsecli_message:decode(list_to_binary([B1])),
 	io:format("WM is ~p",[WM]),
-	true = (M =:= WM)
+	M = WM
+%	true = (M =:= WM)
 	.
 
 decode_test1(_Config)->
@@ -24,4 +25,11 @@ decode_test1(_Config)->
 	B1 = <<138,0>>,
 	WM = wsecli_message:decode(list_to_binary([B1])),
 	true = (M =:= WM)
+	.
+
+encode_test(_Config)->
+	B = wsecli_message:encode(<<>>,ping),
+	io:format("B is ~p",[B]),
+	P = [<<137,0>>],
+	B = P
 	.
