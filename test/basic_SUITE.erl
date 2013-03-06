@@ -10,14 +10,18 @@ all() -> [decode_test, decode_test1].
 -spec decode_test(_Config) -> ok.
 decode_test(_Config)->
 	F = #frame{fin=1, opcode = 9, mask = 0, payload_len = 0, payload = <<>>},
-	M = #message{frames=[F], payload = <<>>, type=ping},
+	M = {<<>>,[#message{frames=[F], payload = [], type=ping}]},
+	io:format("M is ~p",[M]),
 	B1 = <<137,0>>,
 	WM = wsecli_message:decode(list_to_binary([B1])),
-	M =:= WM.
+	io:format("WM is ~p",[WM]),
+	true = (M =:= WM)
+	.
 
 decode_test1(_Config)->
 	F = #frame{fin=1, opcode = 10, mask = 0, payload_len = 0, payload = <<>>},
-	M = #message{frames=[F], payload = <<>>, type=ping},
+	M = {<<>>,[#message{frames=[F], payload = [], type=pong}]},
 	B1 = <<138,0>>,
 	WM = wsecli_message:decode(list_to_binary([B1])),
-	M =:= WM.
+	true = (M =:= WM)
+	.
