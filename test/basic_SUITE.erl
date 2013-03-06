@@ -3,15 +3,21 @@
 -include_lib("common_test/include/ct.hrl").
 -include("wsecli.hrl").
 -export([all/0]).
--export([encode_test/1]).
+-export([decode_test/1, decode_test1/1]).
 
-all() -> [encode_test].
+all() -> [decode_test, decode_test1].
 
--spec encode_test(_Config) -> ok.
-encode_test(_Config)->
-	
-	B1 = <<137>>,
-	B2 = wsecli_message:encode(<<137>>,binary),
-	io:format("B2 is ~p",[B2]).
+-spec decode_test(_Config) -> ok.
+decode_test(_Config)->
+	F = #frame{fin=1, opcode = 9, mask = 0, payload_len = 0, payload = <<>>},
+	M = #message{frames=[F], payload = <<>>, type=ping},
+	B1 = <<137,0>>,
+	WM = wsecli_message:decode(list_to_binary([B1])),
+	M =:= WM.
 
-
+decode_test1(_Config)->
+	F = #frame{fin=1, opcode = 10, mask = 0, payload_len = 0, payload = <<>>},
+	M = #message{frames=[F], payload = <<>>, type=ping},
+	B1 = <<138,0>>,
+	WM = wsecli_message:decode(list_to_binary([B1])),
+	M =:= WM.
