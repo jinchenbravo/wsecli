@@ -90,7 +90,6 @@ decode_test(_Config)->
 	FF2 = #frame{fin=0, opcode = 2, mask = 0, payload_len = 2, payload = <<2,3>>},
 	MM1 = [#message{frames=[FF1,FF2], payload = <<1,2,3>>, type=binary}],
 	io:format("MM1 is ~p",[MM1]),
-	io:format("WM7 is ~p",[WM7]),	
 	MM1 = WM7,
 
 	ok.
@@ -116,5 +115,6 @@ encode_test(_Config)->
 	% {RB3,WM3} = wsecli_message:decode(B3),
 	% io:format("WM3 is ~p",[WM3]),
 	B4 = wsecli_message:encode("b",text),
-	io:format("B4 is ~p",[B4])	
-	.
+	io:format("B4 is ~p",[B4]),
+
+	ok.
