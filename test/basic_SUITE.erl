@@ -61,8 +61,39 @@ decode_test(_Config)->
 	{RB5,WM5} = wsecli_message:decode(B5),
 	io:format("WM5 is ~p",[WM5]),
 	io:format("RB5 is ~p",[RB5]),
-	RB5 = B5
-	.
+	RB5 = B5,
+
+	%
+	%
+	%
+
+	B8 = <<2,126,1,2,3,4,5>>,
+	{RB8,WM8} = wsecli_message:decode(B8),
+	io:format("WM8 is ~p",[WM8]),
+	io:format("RB8 is ~p",[RB8]),
+	RB8 = B8,
+
+	%
+	% if the first bit is set to 0, then it is considered as fragment of one message
+	% decode fragment WS messages, the return message should contain 2 frames
+	%
+	B6 = <<2,2,2,3>>,
+	{RB6,WM6} = wsecli_message:decode(B6),
+	io:format("WM6 is ~p",[WM6]),
+	io:format("RB6 is ~p",[RB6]),
+	B7 = <<130,1,1>>,
+	TWM6 = lists:nth(1, WM6),
+	{RB7,WM7} = wsecli_message:decode(B7,TWM6),
+	io:format("WM7 is ~p",[WM7]),
+	io:format("RB7 is ~p",[RB7]),
+	FF1 = #frame{fin=1, opcode = 2, mask = 0, payload_len = 1, payload = <<1>>},
+	FF2 = #frame{fin=0, opcode = 2, mask = 0, payload_len = 2, payload = <<2,3>>},
+	MM1 = [#message{frames=[FF1,FF2], payload = <<1,2,3>>, type=binary}],
+	io:format("MM1 is ~p",[MM1]),
+	io:format("WM7 is ~p",[WM7]),	
+	MM1 = WM7,
+
+	ok.
 
 encode_test(_Config)->
 	B = wsecli_message:encode(<<>>,ping),
