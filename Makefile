@@ -22,6 +22,8 @@ get-deps:
 
 compile-deps:
 	@$(REBAR) compile
-test: compile
+test: compile eunit
 	@$(REBAR) ct
+eunit: compile
+	@$(REBAR) skip_deps=true eunit
 

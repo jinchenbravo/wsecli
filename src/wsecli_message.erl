@@ -17,6 +17,7 @@
 
 -module(wsecli_message).
 -include("wsecli.hrl").
+-include_lib("eunit/include/eunit.hrl").
 
 -export([encode/2, decode/1, decode/2]).
 
@@ -139,7 +140,8 @@ build_message(Message, Frames) ->
 
 build_payload_from_frames(close, [Frame]) ->
   case Frame#frame.payload of
-    <<>> -> {undefined, undefined};
+%    <<>> -> {undefined, undefined};
+    <<>> -> [];
     <<Status:16, Reason/binary>> -> {Status, binary_to_list(Reason)}
   end;
 
@@ -158,3 +160,21 @@ concatenate_payload_from_frames([], Acc) ->
 concatenate_payload_from_frames([Frame | Rest], Acc) ->
   concatenate_payload_from_frames(Rest, <<Acc/binary, (Frame#frame.payload)/binary>>).
 
+encode_test()->
+  ?assertEqual(1, 1),
+  ok.
+
+decode_test()->
+  %
+  % test decode ping message
+  %
+  F = #frame{fin=1, opcode = 9, mask = 0, payload_len = 0, payload = <<>>},
+  M = [#message{frames=[F], payload = [], type=ping}],
+  io:format("M is ~p",[M]),
+  B1 = <<137,0>>,
+  {RB,WM} = decode(B1),
+  io:format("WM is ~p",[WM]),
+  ?assertEqual(M, WM),
+  ?assertEqual(RB, <<>>),
+
+  ok.
